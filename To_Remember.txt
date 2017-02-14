@@ -10,3 +10,4 @@ TO REMEMBER
 
 AT+IPR? //Baudrate display
 AT+IPR=9600 // Set to 9600 -> for software Serial on UNO
+AT&W // Save state to local config
