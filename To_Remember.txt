@@ -11,3 +11,25 @@ TO REMEMBER
 AT+IPR? //Baudrate display
 AT+IPR=9600 // Set to 9600 -> for software Serial on UNO
 AT&W // Save state to local config
+AT+CMGF=1 //SMS Message Text format
+at+cmgs="+4916099115174" Sendto: ... abschließen mit ctrl+z
+AT+AGPS=1 // AGPS ON
+AT+GPS=1 // GPS ON
+
+
+
+------------
+2. Functions
+------------
+
+	- "status"" --> time, signal, available commands, 
+	- "pos" --> last good position + gmaps link
+	- "fenceon" --> set fence to 20m, when further trigger alert sms
+	- "fenceoff" --> disable fence
+
+
+
+
+----
+1. boot up
+2. connect to serial (pin2/3 softserial) 9600bdr
