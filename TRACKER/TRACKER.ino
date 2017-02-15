@@ -1,6 +1,10 @@
+#include <TinyGPS.h>
+
 int PWR_PIN = 2;
 String content = "";
 String character;
+
+
 void setup() {
 
   pinMode(PWR_PIN, OUTPUT);
@@ -41,6 +45,76 @@ void loop() {
     }
     delay(0);
   }
+
+/*SEND SMS 
+ * 
+ * 
+ *     Serial.println("Sending SMS");
+    
+    sprintf(aux_string,"AT+CMGS=\"%s\"", phone_number);
+    answer = sendATcommand(aux_string, ">", 2000);    // send the SMS number
+    if (answer == 1)
+    {
+        Serial.println(sms_text);
+        Serial.write(0x1A);
+        answer = sendATcommand("", "OK", 20000);
+        if (answer == 1)
+        {
+            Serial.print("Sent ");    
+        }
+        else
+        {
+            Serial.print("error ");
+        }
+    }
+    else
+    {
+        Serial.print("error ");
+        Serial.println(answer, DEC);
+    }
+
+ * 
+ */
+
+
+
+  /*
+   * READ SMS FROM MEMORY
+    answer = sendATcommand("AT+CMGR=1", "+CMGR:", 2000);    // reads the first SMS
+    if (answer == 1)
+    {
+        answer = 0;
+        while(Serial.available() == 0);
+        // this loop reads the data of the SMS
+        do{
+            // if there are data in the UART input buffer, reads it and checks for the asnwer
+            if(Serial.available() > 0){    
+                SMS[x] = Serial.read();
+                x++;
+                // check if the desired answer (OK) is in the response of the module
+                if (strstr(SMS, "OK") != NULL)    
+                {
+                    answer = 1;
+                }
+            }
+        }while(answer == 0);    // Waits for the asnwer with time out
+        
+        SMS[x] = '\0';
+        
+        Serial.print(SMS);    
+        
+    }
+    else
+    {
+        Serial.print("error ");
+        Serial.println(answer, DEC);
+    }
+
+   */
+
+
+
+
 }
 
 void power_on() {
