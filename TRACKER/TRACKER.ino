@@ -25,6 +25,9 @@ void setup() {
 
   Serial.print("Setting SMS mode...");
   sendATcommand("AT+CMGF=1", "OK", 1000);
+  Serial.print("Setting Memory Locations...");
+  sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", "OK", 1000); 
+  
 }
 
 
