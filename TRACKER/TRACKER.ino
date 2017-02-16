@@ -1,14 +1,14 @@
+#include <Arduino.h>
+#include <NMEAGPS.h>
 #include <TinyGPS.h>
-
-
-
-
 
 int PWR_PIN = 2;
 String content = "";
 String character;
 TinyGPS gps;
 
+float lon, lat, sat, prec, alt, spd, crs;
+long unsigned age, Date, Time;
 
 
 void setup() {
@@ -84,7 +84,27 @@ void loop() {
      delay(0);
 
     }*/
-  get_GPS();
+  //get_GPS(&lat, &lon, &sat, &prec, &age, &alt, &spd, &crs, &Date, &Time);
+
+  /* Get last know GPS Coordinates */
+   Serial.println(lat, 6);
+   Serial.println(lon, 6);
+    Serial.println(Date);
+    Serial.println(Time);
+    Serial.println(spd,3);
+    Serial.println(crs,3);
+    Serial.println(alt);
+    Serial.println(prec);
+/*
+ * READ SMS
+ * //pint sms
+ * 
+ * if
+ * location
+ * DELETE ALL SMS
+ * 
+ * SEND SMS
+ */
   delay(1000);
 }
 /*SEND SMS
@@ -154,64 +174,42 @@ void loop() {
 */
 
 
-int8_t get_GPS() {
+void get_GPS(float *lat, float *lon, float *sat, float *prec, long unsigned *age,  float *alt, float *spd, float *crs, long unsigned *Date, long unsigned *Time) {
 
-  int8_t counter, answer, looptrigger;
-  long previous;
   bool newData = false;
-  unsigned long chars;
-  unsigned short sentences, failed;
-
-  // For three seconds we parse GPS data and report some key values
+  long unsigned date, lst_time, fix_age;
+  //*lat = 1;
   for (unsigned long start = millis(); millis() - start < 3000;)
   {
     while (Serial2.available())
     {
       char c = Serial2.read();
-      //Serial.println("DEBUG");
-      //Serial.write(c); // uncomment this line if you want to see the GPS data flowing
       if (gps.encode(c)) // Did a new valid sentence come in?
         newData = true;
     }
-}
-
+  }
   if (newData)
   {
     float flat, flon;
     unsigned long age;
     gps.f_get_position(&flat, &flon, &age);
-    Serial.print("LAT=");
-    Serial.println(flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flat, 6);
-    Serial.print(" LON=");
-    Serial.println(flon == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flon, 6);
-    Serial.print(" SAT=");
-    Serial.println(gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES ? 0 : gps.satellites());
-    Serial.print(" PREC=");
-    Serial.println(gps.hdop() == TinyGPS::GPS_INVALID_HDOP ? 0 : gps.hdop());
+
+
+
+    *lat = flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flat, 6;
+    *lon = flon == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flon, 6;
+    *sat = gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES ? 0 : gps.satellites();
+    *prec = gps.hdop() == TinyGPS::GPS_INVALID_HDOP ? 0 : gps.hdop();
+    *alt = gps.f_altitude();
+    *spd = gps.f_speed_kmph();
+    *crs = gps.f_course();
+
+    gps.get_datetime(&date,&lst_time,&fix_age);
+    *Date = date;
+    *Time = lst_time;
+    //*age = fix_age;
   }
-
-  gps.stats(&chars, &sentences, &failed);
-  Serial.print(" CHARS=");
-  Serial.println(chars);
-  Serial.print(" SENTENCES=");
-  Serial.println(sentences);
-  Serial.print(" CSUM ERR=");
-  Serial.println(failed);
-  if (chars == 0)
-    Serial.println("** No characters received from GPS: check wiring **");
-
-Serial.println();
-Serial.println();
-  // STOP FLOODING THE SERIAL CONNECTION WITH NMEA STRINGS
-  //Serial.println("Kill GPS-NMEA Output.....");
-  //sendATcommand("AT+GPSRD=0", "OK", 3000);
-  //Serial.println("Kill GPS-NMEA Output.....SUCCESS");
-
-  return answer;
-  
 }
-
-
 
 
 void power_on() {
