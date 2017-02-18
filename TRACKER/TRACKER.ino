@@ -2,6 +2,8 @@
 #include <NMEAGPS.h>
 #include <TinyGPS.h>
 
+
+
 int PWR_PIN = 2;
 String content = "";
 String character;
@@ -9,13 +11,15 @@ TinyGPS gps;
 
 float lon, lat, sat, prec, alt, spd, crs;
 long unsigned age, Date, Time;
-
+String tel_number;
 
 
 int8_t answer;
 int x;
 char aux_string[30];
 char SMS[200];
+char order[200];
+
 
 
 
@@ -29,9 +33,7 @@ void setup() {
   Serial.println("Starting...");
   power_on();
 
-  delay(3000);
-
-  delay(3000);
+  delay(10000);
 
   Serial.println("Connecting to the network...");
 
@@ -64,18 +66,17 @@ void setup() {
 
 
 void loop() {
-   while (true) {
-     if (Serial1.available()) {
-       Serial.write(Serial1.read());
-     }
-     if (Serial.available()) {
-       Serial1.write(Serial.read());
-     }
-     delay(0);
 
-    }
-  //get_GPS(&lat, &lon, &sat, &prec, &age, &alt, &spd, &crs, &Date, &Time);
- 
+  delay(1000);
+
+  /*
+
+  */
+
+  Serial.println(readSMS());
+
+
+
 }
 
 
@@ -115,6 +116,61 @@ void get_GPS(float *lat, float *lon, float *sat, float *prec, long unsigned *age
     *Time = lst_time;
   }
 }
+
+const char* readSMS() {
+
+
+  answer = sendATcommand("AT+CMGR=1", "+CMGR:", 2000);    // reads the first SMS
+
+
+  if (answer == 1)
+  {
+    answer = 0;
+    while (Serial1.available() == 0);
+    // this loop reads the data of the SMS
+    do {
+      // if there are data in the UART input buffer, reads it and checks for the asnwer
+      if (Serial1.available() > 0) {
+        SMS[x] = Serial1.read();
+        x++;
+        // check if the desired answer (OK) is in the response of the module
+        if (strstr(SMS, "OK") != NULL)
+        {
+          answer = 1;
+        }
+      }
+    } while (answer == 0);   // Waits for the asnwer with time out
+
+    SMS[x] = '\0';
+  }
+  else
+  {
+    Serial.print("error ");
+    Serial.println(answer, DEC);
+  }
+
+  if (find_text("testp", SMS) > 10)
+  {
+    static char* SMS = "function";
+    Serial.println("DEBUG");
+  }
+  Serial.print(find_text("testp", SMS));
+  static char* SMS = "function";
+
+  return SMS;
+}
+
+
+
+
+void readNum(String number) {
+
+}
+
+void delete_sms() {
+
+}
+
 
 
 void power_on() {
@@ -173,3 +229,15 @@ int8_t sendATcommand(char* ATcommand, char* expected_answer, unsigned int timeou
 
   return answer;
 }
+
+
+int find_text(String code, String full_text) {
+  int foundpos = -1;
+  for (int i = 0; i <= full_text.length() - code.length(); i++) {
+    if (full_text.substring(i, code.length() + i) == code) {
+      foundpos = i;
+    }
+  }
+  return foundpos;
+}
+
